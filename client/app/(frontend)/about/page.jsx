@@ -249,19 +249,7 @@ export default function AboutPage() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* Bottom info – always visible */}
-                                <div className="prof-card-meta">
-                                    <span className="prof-card-meta-index">{d.index}</span>
-                                    <div className="prof-card-meta-text">
-                                        <h3 className="prof-card-meta-name">{d.name}</h3>
-                                        <p className="prof-card-meta-role">{d.role}</p>
-                                    </div>
-                                    <div className="prof-card-meta-arrow">
-                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                            <path d="M3.75 9H14.25M14.25 9L9 3.75M14.25 9L9 14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </div>
-                                </div>
+
                             </div>
                         ))}
                     </div>
