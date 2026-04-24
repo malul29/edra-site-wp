@@ -2,59 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+const directors = [
+    {
+        src: "/bu ega.png",
+        alt: "Ar. Megawati Nyonri",
+        name: "Ar. Megawati Nyonri, S.T., M.PWK., IAI",
+        role: "President Director",
+        index: "01",
+    },
+    {
+        src: "/bu asti.png",
+        alt: "Ning Widyastuti",
+        name: "Ning Widyastuti, S.T",
+        role: "Operational Director",
+        index: "02",
+    },
+    {
+        src: "/pak ravi.png",
+        alt: "Ir. Ravi Firmansyah",
+        name: "Ir. Ravi Firmansyah, S.T., IPP",
+        role: "Project Director",
+        index: "03",
+    },
+    {
+        src: "/pak yarka.png",
+        alt: "Mochhamad Yarkasih",
+        name: "Mochhamad Yarkasih, S.T., M.T",
+        role: "Technical Director",
+        index: "04",
+    },
+];
+
 export default function AboutPage() {
-    const sectionRef = useRef(null);
-    const textGroupRef = useRef(null);
-    const leftPersonRef = useRef(null);
-    const rightPersonRef = useRef(null);
-    const paragraphRef = useRef(null);
-
-    useEffect(() => {
-        gsap.registerPlugin(ScrollTrigger);
-        
-        let mm = gsap.matchMedia();
-
-        mm.add("(min-width: 769px)", () => {
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: "center center",
-                    end: "+=150%",
-                    scrub: 1,
-                    pin: true,
-                }
-            });
-
-            // Move entire text group (OUR + PROFESSIONAL) up together
-            tl.to(textGroupRef.current, {
-                yPercent: -60,
-                scale: 0.5,
-            }, 0);
-
-            tl.to(leftPersonRef.current, {
-                xPercent: -40,
-            }, 0);
-
-            tl.to(rightPersonRef.current, {
-                xPercent: 40,
-            }, 0);
-
-            tl.to(paragraphRef.current, {
-                opacity: 1,
-                y: 0,
-            }, 0.3);
-
-            return () => tl.kill();
-        });
-
-        return () => mm.revert();
-    }, []);
 
     return (
         <>
@@ -227,33 +209,61 @@ export default function AboutPage() {
                         </div>
                     </div>
                 </section>
-                {/* ── TEAM ── */}
-                <section className="team-hero-section" ref={sectionRef}>
-                    <div className="team-hero-images">
-                        <div className="team-hero-person" ref={leftPersonRef}>
-                            <Image src="/Megawati Nyonri.png" alt="Ar. Megawati Nyonri" fill sizes="(max-width: 768px) 80vw, 30vw" style={{ objectFit: "contain", objectPosition: "bottom" }} />
-                            <div className="team-hero-info">
-                                <h3>Ar. Megawati Nyonri</h3>
-                                <p>President Director</p>
-                            </div>
-                        </div>
-                        <div className="team-hero-person" ref={rightPersonRef}>
-                            <Image src="/Ning Widyastuti.png" alt="Ning Widyastuti" fill sizes="(max-width: 768px) 80vw, 30vw" style={{ objectFit: "contain", objectPosition: "bottom" }} />
-                            <div className="team-hero-info">
-                                <h3>Ning Widyastuti</h3>
-                                <p>Operational Director</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="team-hero-text-group" ref={textGroupRef}>
-                        <span className="team-hero-bg-text" aria-hidden="true">OUR</span>
-                        <h2 className="team-hero-fg-text">PROFESSIONAL</h2>
-                        <div className="team-hero-paragraph" ref={paragraphRef}>
-                            <p>
-                                We create spaces that enrich lives and inspire emotions, blending form, function, and storytelling
-                                to craft experiences that resonate deeply with each space and its inhabitants.
+                {/* ── PROFESSIONAL TEAM ── */}
+                <section className="prof-section">
+                    {/* Section Header */}
+                    <div className="prof-header">
+                        <div className="prof-header-inner">
+                            <span className="prof-label">Our Professional</span>
+                            <h2 className="prof-title">
+                                <span className="prof-title-line">THE</span>
+                                <span className="prof-title-line prof-title-line--accent">DIRECTORS</span>
+                            </h2>
+                            <p className="prof-subtitle">
+                                We create spaces that enrich lives and inspire emotions, blending form,
+                                function, and storytelling to craft experiences that resonate deeply.
                             </p>
                         </div>
+                        <div className="prof-watermark" aria-hidden="true">TEAM</div>
+                    </div>
+
+                    {/* Director Grid */}
+                    <div className="prof-grid">
+                        {directors.map((d) => (
+                            <div key={d.index} className="prof-card">
+                                <div className="prof-card-visual">
+                                    <Image
+                                        src={d.src}
+                                        alt={d.alt}
+                                        fill
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                        style={{ objectFit: "cover", objectPosition: "top center" }}
+                                    />
+                                    {/* Overlay on hover */}
+                                    <div className="prof-card-overlay">
+                                        <div className="prof-card-overlay-content">
+                                            <span className="prof-card-index">{d.index}</span>
+                                            <div className="prof-card-divider" />
+                                            <h3 className="prof-card-name">{d.name}</h3>
+                                            <p className="prof-card-role">{d.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Bottom info – always visible */}
+                                <div className="prof-card-meta">
+                                    <span className="prof-card-meta-index">{d.index}</span>
+                                    <div className="prof-card-meta-text">
+                                        <h3 className="prof-card-meta-name">{d.name}</h3>
+                                        <p className="prof-card-meta-role">{d.role}</p>
+                                    </div>
+                                    <div className="prof-card-meta-arrow">
+                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                            <path d="M3.75 9H14.25M14.25 9L9 3.75M14.25 9L9 14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </section>
 

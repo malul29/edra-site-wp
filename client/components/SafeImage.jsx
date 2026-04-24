@@ -21,7 +21,7 @@ export default function SafeImage({ src, fallbackSrc, alt, unoptimized = false, 
             src={imgSrc || fallbackSrc}
             alt={alt}
             onError={(e) => {
-                console.error("SafeImage failed to load:", imgSrc, "falling back to:", fallbackSrc);
+                console.warn("SafeImage: could not load image, using fallback →", fallbackSrc, "(original:", imgSrc, ")");
                 if (imgSrc !== fallbackSrc && fallbackSrc) {
                     setImgSrc(fallbackSrc);
                 }
