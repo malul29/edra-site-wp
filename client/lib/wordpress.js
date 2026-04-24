@@ -84,6 +84,10 @@ const PORTFOLIO_FIELDS_FRAGMENT = `
     year
     description
     youtubeUrl
+    siteArea
+    buildingArea
+    projectType
+    service
   }
 `;
 
@@ -248,7 +252,15 @@ function normalizePortfolio(node) {
   const gallery = parseGalleryFromContent(node.content);
 
   // Main image from featured media
-  const imageUrl = resolveImageUrl(node.featuredImage);
+  let imageUrl = resolveImageUrl(node.featuredImage);
+  if (!imageUrl && gallery.length > 0) {
+    imageUrl = gallery[0].image;
+  }
+
+  let imageUrlFull = resolveImageUrlFull(node.featuredImage);
+  if (!imageUrlFull && gallery.length > 0) {
+    imageUrlFull = gallery[0].image;
+  }
 
   return {
     id: node.databaseId,
@@ -257,9 +269,13 @@ function normalizePortfolio(node) {
     location: acf.location || "",
     category: acf.category || "",
     year: acf.year || "",
+    siteArea: acf.siteArea || "",
+    buildingArea: acf.buildingArea || "",
+    projectType: acf.projectType || "",
+    service: acf.service || "",
     description: acf.description || stripHtmlTags(node.content || ""),
     image: imageUrl,
-    imageFull: resolveImageUrlFull(node.featuredImage) || imageUrl,
+    imageFull: imageUrlFull || imageUrl,
     gallery,
     youtubeUrl: acf.youtubeUrl || "",
   };

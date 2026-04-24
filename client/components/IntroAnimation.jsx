@@ -115,16 +115,15 @@ export default function IntroAnimation({ onComplete }) {
                 style={{
                     ...sharedFixed,
                     zIndex: 9999,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    display: "grid",
+                    placeItems: "center",
                 }}
             >
                 {/* Single word slot */}
                 <div
                     ref={morphWrapRef}
                     style={{
-                        position: "absolute",
+                        gridArea: "1 / 1",
                         width: "min(92vw, 980px)",
                         pointerEvents: "none",
                     }}
@@ -142,7 +141,7 @@ export default function IntroAnimation({ onComplete }) {
                 <div
                     ref={logoWrapRef}
                     style={{
-                        position: "absolute",
+                        gridArea: "1 / 1",
                         width: "clamp(200px, 24vw, 340px)",
                         opacity: 0,
                         visibility: "hidden",

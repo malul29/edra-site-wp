@@ -201,7 +201,7 @@ export default function ProjectDetailPage({ params }) {
             {/* Hero Section */}
             <section className="project-detail-hero">
                 <div className="project-detail-hero-img">
-                    <SafeImage src={resolveMediaUrlForSize(project.imageFull || project.image, 'full')} fallbackSrc="/edra-logo.png" alt={project.title} fill sizes="100vw" style={{ objectFit: "cover" }} priority unoptimized={true} />
+                    <SafeImage src={resolveMediaUrlForSize(project.imageFull || project.image, 'full')} fallbackSrc="/edra-logo.png" alt={project.title} fill sizes="100vw" style={{ objectFit: "cover" }} priority unoptimized />
                 </div>
                 <div className="project-detail-hero-overlay" />
                 <div className="project-detail-hero-content">
@@ -234,6 +234,30 @@ export default function ProjectDetailPage({ params }) {
                                 <span className="meta-label">Category</span>
                                 <span className="meta-value">{project.category || "Architecture"}</span>
                             </div>
+                            {(project.siteArea || project.site_area) && (
+                                <div className="meta-item">
+                                    <span className="meta-label">Site Area</span>
+                                    <span className="meta-value">{project.siteArea || project.site_area}</span>
+                                </div>
+                            )}
+                            {(project.buildingArea || project.building_area) && (
+                                <div className="meta-item">
+                                    <span className="meta-label">Building Area</span>
+                                    <span className="meta-value">{project.buildingArea || project.building_area}</span>
+                                </div>
+                            )}
+                            {(project.projectType || project.project_type) && (
+                                <div className="meta-item">
+                                    <span className="meta-label">Project Type</span>
+                                    <span className="meta-value">{project.projectType || project.project_type}</span>
+                                </div>
+                            )}
+                            {project.service && (
+                                <div className="meta-item">
+                                    <span className="meta-label">Service</span>
+                                    <span className="meta-value">{project.service}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
