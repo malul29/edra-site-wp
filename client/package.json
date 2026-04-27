@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "set HOSTNAME=localhost&& node .next/standalone/server.js",
-    "postbuild": "node scripts/copy-standalone.mjs"
+    "start": "next start"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

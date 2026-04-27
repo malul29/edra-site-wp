@@ -214,10 +214,10 @@ export default function AboutPage() {
                     {/* Section Header */}
                     <div className="prof-header">
                         <div className="prof-header-inner">
-                            <span className="prof-label">Our Professional</span>
+                            <span className="prof-label">OUR TEAM</span>
                             <h2 className="prof-title">
-                                <span className="prof-title-line">THE</span>
-                                <span className="prof-title-line prof-title-line--accent">DIRECTORS</span>
+                                <span className="prof-title-line">OUR</span>
+                                <span className="prof-title-line prof-title-line--accent">PROFFESIONAL</span>
                             </h2>
                             <p className="prof-subtitle">
                                 We create spaces that enrich lives and inspire emotions, blending form,

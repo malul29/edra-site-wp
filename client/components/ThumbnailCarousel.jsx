@@ -125,7 +125,8 @@ export default function ThumbnailCarousel({ images, onImageClick }) {
                                 sizes="(max-width: 900px) 100vw, 900px"
                                 priority={i === 0}
                                 loading={i === 0 ? "eager" : "lazy"}
-                                quality={75}
+                                quality={100}
+                                unoptimized={true}
                                 draggable={false}
                             />
                             <div className="tcarousel-slide-overlay">

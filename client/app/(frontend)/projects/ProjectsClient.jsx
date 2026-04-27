@@ -244,6 +244,7 @@ function ProjectCard({ project, variant, revealIndex }) {
                     className="project-masonry-image"
                     loading="lazy"
                     quality={100}
+                    unoptimized={true}
                 />
                 <div className="project-masonry-overlay">
                     <h3 className="project-masonry-title">{project.title}</h3>

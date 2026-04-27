@@ -112,7 +112,8 @@ export default function Lightbox({ images, currentIndex, onClose, onNext, onPrev
             height={1080}
             sizes="100vw"
             style={{ width: "100%", height: "auto", maxHeight: "100%", objectFit: "contain" }}
-            quality={85}
+            quality={100}
+            unoptimized={true}
           />
         </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -174,20 +174,27 @@ export default function HomeClient({ initialPortfolio, initialServices }) {
         return () => observer.disconnect();
     }, []);
 
-    const [featured, setFeatured] = useState(() => portfolio || []);
+    const [featured, setFeatured] = useState(() => {
+        if (!portfolio) return [];
+        return portfolio.filter(p => {
+            const searchStr = `${p.category || ""} ${p.projectType || ""} ${p.service || ""}`.toLowerCase();
+            return searchStr.includes("high rise") || searchStr.includes("high-rise");
+        });
+    });
 
     useEffect(() => {
-        // Randomize on client mount to prevent server hydration mismatches
-        if (portfolio && portfolio.length > 0) {
-            setFeatured([...portfolio].sort(() => Math.random() - 0.5));
+        if (featured && featured.length > 0) {
+            // Optional: Shuffle order after hydration to randomize display without hydration error
+            setFeatured(prev => [...prev].sort(() => Math.random() - 0.5));
         }
-    }, [portfolio]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    const [heroImages, setHeroImages] = useState(() => {
-        const rawImages = featured.map((item) => resolveMediaUrl(item.imageFull || item.image)).filter(src => src && src !== "/edra-logo.png");
+    const heroImages = useMemo(() => {
+        const rawImages = featured.map((item) => resolveMediaUrlForSize(item.imageFull || item.image, 'full')).filter(src => src && src !== "/edra-logo.png");
         const uniqueImages = Array.from(new Set(rawImages));
         return uniqueImages.length > 0 ? uniqueImages : [HERO_IMG];
-    });
+    }, [featured]);
 
     // Rotate hero image every 15 seconds
     useEffect(() => {
@@ -377,6 +384,7 @@ export default function HomeClient({ initialPortfolio, initialServices }) {
                                         style={{ objectFit: "cover" }}
                                         loading="lazy"
                                         quality={100}
+                                        unoptimized={true}
                                     />
                                 </div>
                                 <div className="home-service-overlay" />

@@ -68,10 +68,9 @@ export default function Footer() {
               <h4 className="footer-column-title">SERVICES</h4>
               <nav className="footer-nav">
                 <span>Architecture Design</span>
-                <span>Project Management</span>
-                <span>Construction Services</span>
                 <span>Interior Design</span>
-                <span>Consultation</span>
+                <span>Management</span>
+                <span>Construction</span>
               </nav>
             </div>
 

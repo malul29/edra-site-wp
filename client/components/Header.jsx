@@ -188,13 +188,13 @@ export default function Header() {
               <TextRoll className="text-[inherit] leading-[1] font-[inherit] tracking-[inherit]">ARCHITECTURE</TextRoll>
             </Link>
             <Link href="/services" className="services-item" onClick={() => setServicesOpen(false)}>
+              <TextRoll className="text-[inherit] leading-[1] font-[inherit] tracking-[inherit]">INTERIOR DESIGN</TextRoll>
+            </Link>
+            <Link href="/services" className="services-item" onClick={() => setServicesOpen(false)}>
               <TextRoll className="text-[inherit] leading-[1] font-[inherit] tracking-[inherit]">MANAGEMENT</TextRoll>
             </Link>
             <Link href="/services" className="services-item" onClick={() => setServicesOpen(false)}>
               <TextRoll className="text-[inherit] leading-[1] font-[inherit] tracking-[inherit]">CONSTRUCTION</TextRoll>
-            </Link>
-            <Link href="/services" className="services-item" onClick={() => setServicesOpen(false)}>
-              <TextRoll className="text-[inherit] leading-[1] font-[inherit] tracking-[inherit]">INTERIOR DESIGN</TextRoll>
             </Link>
           </div>
         </div>

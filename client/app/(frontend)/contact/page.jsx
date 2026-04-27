@@ -186,7 +186,6 @@ export default function ContactPage() {
                                         <option>Interior Design</option>
                                         <option>Project Management</option>
                                         <option>Construction</option>
-                                        <option>Consultation</option>
                                     </select>
                                 </div>
 
