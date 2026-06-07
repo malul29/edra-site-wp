@@ -11,6 +11,7 @@ const directors = [
         alt: "Ar. Megawati Nyonri",
         name: "Ar. Megawati Nyonri, S.T., M.PWK., IAI",
         role: "President Director",
+        focus: "Urban masterplanning, large-scale spatial architecture, and city development policy validation.",
         index: "01",
     },
     {
@@ -18,6 +19,7 @@ const directors = [
         alt: "Ning Widyastuti",
         name: "Ning Widyastuti, S.T",
         role: "Operational Director",
+        focus: "Business workflows coordination, procurement control, and multi-project pipeline scheduling.",
         index: "02",
     },
     {
@@ -25,6 +27,7 @@ const directors = [
         alt: "Ir. Ravi Firmansyah",
         name: "Ir. Ravi Firmansyah, S.T., IPP",
         role: "Project Director",
+        focus: "Engineering site execution, construction quality assurance, and on-site engineering supervision.",
         index: "03",
     },
     {
@@ -32,6 +35,7 @@ const directors = [
         alt: "Mochhamad Yarkasih",
         name: "Mochhamad Yarkasih, S.T., M.T",
         role: "Technical Director",
+        focus: "Structural feasibility analysis, technical drafting precision, and building compliance auditing.",
         index: "04",
     },
 ];
@@ -193,7 +197,7 @@ export default function AboutPage() {
                             <span className="prof-label">OUR TEAM</span>
                             <h2 className="prof-title">
                                 <span className="prof-title-line">OUR</span>
-                                <span className="prof-title-line prof-title-line--accent">PROFFESIONAL</span>
+                                <span className="prof-title-line prof-title-line--accent">PROFESSIONAL</span>
                             </h2>
                             <p className="prof-subtitle">
                                 We create spaces that enrich lives and inspire emotions, blending form,
@@ -207,7 +211,7 @@ export default function AboutPage() {
                     <div className="prof-grid">
                         {directors.map((d) => (
                             <div key={d.index} className="prof-card">
-                                <div className="prof-card-visual">
+                                <div className="prof-card-image-wrapper">
                                     <Image
                                         src={d.src}
                                         alt={d.alt}
@@ -215,17 +219,14 @@ export default function AboutPage() {
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                         style={{ objectFit: "cover", objectPosition: "top center" }}
                                     />
-                                    {/* Overlay on hover */}
-                                    <div className="prof-card-overlay">
-                                        <div className="prof-card-overlay-content">
-                                            <span className="prof-card-index">{d.index}</span>
-                                            <div className="prof-card-divider" />
-                                            <h3 className="prof-card-name">{d.name}</h3>
-                                            <p className="prof-card-role">{d.role}</p>
-                                        </div>
-                                    </div>
+                                    <span className="prof-card-index">{d.index}</span>
                                 </div>
-
+                                <div className="prof-card-info">
+                                    <span className="prof-card-role">{d.role}</span>
+                                    <h3 className="prof-card-name">{d.name}</h3>
+                                    <div className="prof-card-divider" />
+                                    <p className="prof-card-focus">{d.focus}</p>
+                                </div>
                             </div>
                         ))}
                     </div>

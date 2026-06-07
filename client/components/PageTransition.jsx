@@ -1,19 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useLayoutEffect, useEffect, useState, useRef } from "react";
 
 /**
- * Dennis Snellenberg-style page transition.
+ * Slide page transition — bulletproof approach.
  *
- * A dark curved SVG curtain slides up from the bottom, covering the screen.
- * While the screen is covered, the page name is shown centered.
- * Then the curtain continues upward, peeling away with a convex curve
- * to reveal the new page underneath.
- *
- * KEY: We freeze the old page content until the curtain fully covers,
- * preventing any flash of the new page.
+ * KEY FIXES for "new page flashing before transition":
+ *  1. Content visibility is computed SYNCHRONOUSLY during render
+ *     (not in an effect), so it's hidden on the exact same frame.
+ *  2. The slide panel is ALWAYS mounted in the DOM (no AnimatePresence
+ *     mount delay). It's just positioned off-screen when idle.
+ *  3. CSS transitions drive the panel movement — no framer-motion needed
+ *     for the panel itself, eliminating any animation-library frame delays.
  */
 
 /* ── Route → display name ──────────────────────────── */
@@ -25,191 +24,195 @@ function getPageName(path) {
     return segment.charAt(0).toUpperCase() + segment.slice(1);
 }
 
-/* ── SVG path helpers ──────────────────────────────── */
-const initialPath = `M 0 100 Q 50 200 100 100 L 100 200 L 0 200 Z`;
-const targetPath  = `M 0 0   Q 50 0   100 0   L 100 200 L 0 200 Z`;
-const exitStart   = `M 0 0 L 100 0 L 100 100 Q 50 100 0 100 Z`;
-const exitEnd     = `M 0 0 L 100 0 L 100 0   Q 50 0   0 0   Z`;
-
 /* ── Timing ────────────────────────────────────────── */
-const ENTER_MS = 700;
-const HOLD_MS  = 350;
-const EXIT_MS  = 700;
+const SLIDE_IN_MS  = 550;
+const HOLD_MS      = 280;
+const SLIDE_OUT_MS = 550;
+const TOTAL_MS     = SLIDE_IN_MS + HOLD_MS + SLIDE_OUT_MS;
 
 export default function PageTransition({ children }) {
     const pathname = usePathname();
 
-    // Frozen children — we control WHEN the displayed content updates
-    const [frozenChildren, setFrozenChildren] = useState(children);
-    const [transitioning, setTransitioning] = useState(false);
-    const [phase, setPhase] = useState("idle"); // idle | enter | hold | exit
+    // phase: "idle" | "slideIn" | "hold" | "slideOut"
+    const [phase, setPhase] = useState("idle");
     const [pageName, setPageName] = useState("");
-    const [isFirstMount, setIsFirstMount] = useState(true);
 
     const prevPathRef = useRef(pathname);
-    const pendingChildrenRef = useRef(children);
     const timersRef = useRef([]);
 
-    // Always track the latest children
-    pendingChildrenRef.current = children;
+    /* ── Synchronous render-time check ──
+     * This runs DURING render (before any effects or paint).
+     * If the pathname has changed but we haven't started transitioning yet,
+     * we know a route change just happened. We hide content immediately. */
+    const routeJustChanged = pathname !== prevPathRef.current && phase === "idle";
 
-    // Skip transition on first mount
-    useEffect(() => {
-        if (isFirstMount) setIsFirstMount(false);
-    }, [isFirstMount]);
+    /* ── Content should be hidden when: ──
+     *  - Route just changed (synchronous, before effect fires)
+     *  - Panel is sliding in (covering the screen)
+     *  - Panel is holding (fully covering)
+     * Content is VISIBLE when:
+     *  - Idle (normal state)
+     *  - Panel is sliding out (revealing new page) */
+    const contentHidden = routeJustChanged || phase === "slideIn" || phase === "hold";
 
-    // Detect route change → start transition
-    useEffect(() => {
-        // Same path or first mount — just update immediately
-        if (pathname === prevPathRef.current || isFirstMount) {
-            prevPathRef.current = pathname;
-            setFrozenChildren(children);
-            return;
-        }
+    /* ── Detect route change → start transition ── */
+    useLayoutEffect(() => {
+        if (prevPathRef.current === pathname) return;
 
-        // Clear any pending timers
+        // Clear pending timers
         timersRef.current.forEach(clearTimeout);
         timersRef.current = [];
 
-        // Freeze current (old) children — don't show new page yet
         setPageName(getPageName(pathname));
-        setTransitioning(true);
-        setPhase("enter");
+        setPhase("slideIn");
 
-        // Phase 1: Curtain covers screen
+        // Phase 1 complete → panel covers entire viewport
         const t1 = setTimeout(() => {
-            // NOW swap content — user can't see it behind the curtain
-            setFrozenChildren(pendingChildrenRef.current);
             window.scrollTo(0, 0);
             setPhase("hold");
 
-            // Phase 2: Brief hold with page name visible
+            // Phase 2 → brief hold with page name
             const t2 = setTimeout(() => {
-                setPhase("exit");
+                setPhase("slideOut");
+                prevPathRef.current = pathname;
 
-                // Phase 3: Curtain reveals new page
+                // Phase 3 complete → panel off-screen, new page visible
                 const t3 = setTimeout(() => {
                     setPhase("idle");
-                    setTransitioning(false);
-                    prevPathRef.current = pathname;
-                }, EXIT_MS);
+                }, SLIDE_OUT_MS);
                 timersRef.current.push(t3);
             }, HOLD_MS);
             timersRef.current.push(t2);
-        }, ENTER_MS);
+        }, SLIDE_IN_MS);
         timersRef.current.push(t1);
 
         return () => {
             timersRef.current.forEach(clearTimeout);
             timersRef.current = [];
         };
-    }, [pathname]); // intentionally only depend on pathname
+    }, [pathname]);
 
-    // When idle and no transition, keep children in sync
+    /* ── First mount: skip transition ── */
     useEffect(() => {
-        if (!transitioning) {
-            setFrozenChildren(children);
-        }
-    }, [children, transitioning]);
+        prevPathRef.current = pathname;
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    /* ── Panel translateX per phase ── */
+    let panelTranslate = "100%";   // off-screen right (idle)
+    let panelDuration = "0s";
+    let panelEasing = "cubic-bezier(0.76, 0, 0.24, 1)";
+
+    if (phase === "slideIn" || routeJustChanged) {
+        panelTranslate = "0%";     // covering viewport
+        panelDuration = `${SLIDE_IN_MS / 1000}s`;
+        panelEasing = "cubic-bezier(0.76, 0, 0.24, 1)";
+    } else if (phase === "hold") {
+        panelTranslate = "0%";     // still covering
+        panelDuration = "0s";
+    } else if (phase === "slideOut") {
+        panelTranslate = "-100%";  // off-screen left
+        panelDuration = `${SLIDE_OUT_MS / 1000}s`;
+        panelEasing = "cubic-bezier(0.22, 1, 0.36, 1)";
+    }
+
+    /* ── Label visibility ── */
+    const showLabel = phase === "hold";
 
     return (
         <>
-            {/* Page content — frozen during transition */}
-            {frozenChildren}
+            {/* Page content — hidden during transitions */}
+            <div
+                style={{
+                    visibility: contentHidden ? "hidden" : "visible",
+                }}
+            >
+                {children}
+            </div>
 
-            {/* ── SVG Curtain Overlay ── */}
-            <AnimatePresence>
-                {phase !== "idle" && (
-                    <motion.div
-                        key="curtain"
+            {/* ── Slide Panel (always mounted, positioned via CSS) ── */}
+            <div
+                style={{
+                    position: "fixed",
+                    inset: 0,
+                    zIndex: 9990,
+                    pointerEvents: phase === "idle" ? "none" : "all",
+                    overflow: "hidden",
+                }}
+            >
+                {/* Dark panel */}
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        background: "#1a1a1a",
+                        transform: `translateX(${panelTranslate})`,
+                        transition: `transform ${panelDuration} ${panelEasing}`,
+                        willChange: "transform",
+                    }}
+                />
+
+                {/* Gold accent line on leading edge */}
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "2px",
+                        height: "100%",
+                        background: "linear-gradient(180deg, rgba(200,170,110,0.6) 0%, rgba(200,170,110,0) 100%)",
+                        transform: `translateX(${panelTranslate})`,
+                        transition: `transform ${panelDuration} ${panelEasing}`,
+                        willChange: "transform",
+                        zIndex: 2,
+                    }}
+                />
+
+                {/* Page name label */}
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 3,
+                        pointerEvents: "none",
+                        opacity: showLabel ? 1 : 0,
+                        transition: "opacity 0.2s ease",
+                    }}
+                >
+                    <span
                         style={{
-                            position: "fixed",
-                            inset: 0,
-                            zIndex: 9990,
-                            pointerEvents: "all",
+                            fontFamily: "var(--sans)",
+                            fontSize: "clamp(1rem, 2vw, 1.4rem)",
+                            fontWeight: 300,
+                            letterSpacing: "0.08em",
+                            color: "#f5f5f5",
+                            textTransform: "capitalize",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            transform: showLabel ? "translateX(0)" : "translateX(20px)",
+                            transition: "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease",
                         }}
-                        exit={{ opacity: 0, transition: { duration: 0, delay: 0 } }}
                     >
-                        <svg
-                            viewBox="0 0 100 200"
-                            preserveAspectRatio="none"
+                        <span
                             style={{
-                                position: "absolute",
-                                width: "100%",
-                                height: "100%",
+                                width: 8,
+                                height: 8,
+                                borderRadius: "50%",
+                                background: "#f5f5f5",
+                                display: "inline-block",
+                                flexShrink: 0,
                             }}
-                        >
-                            <motion.path
-                                fill="#1a1a1a"
-                                initial={{ d: initialPath }}
-                                animate={{
-                                    d: phase === "enter"
-                                        ? targetPath
-                                        : phase === "hold"
-                                            ? exitStart
-                                            : phase === "exit"
-                                                ? exitEnd
-                                                : initialPath,
-                                }}
-                                transition={{
-                                    duration:
-                                        phase === "enter"
-                                            ? ENTER_MS / 1000
-                                            : phase === "hold"
-                                                ? 0.01
-                                                : EXIT_MS / 1000,
-                                    ease: [0.76, 0, 0.24, 1],
-                                }}
-                            />
-                        </svg>
-
-                        {/* Page name label */}
-                        <motion.div
-                            style={{
-                                position: "absolute",
-                                inset: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                zIndex: 2,
-                                pointerEvents: "none",
-                            }}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{
-                                opacity: phase === "hold" || phase === "enter" ? 1 : 0,
-                                y: phase === "exit" ? -40 : 0,
-                            }}
-                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                            <span
-                                style={{
-                                    fontFamily: "var(--sans)",
-                                    fontSize: "clamp(1rem, 2vw, 1.4rem)",
-                                    fontWeight: 300,
-                                    letterSpacing: "0.08em",
-                                    color: "#f5f5f5",
-                                    textTransform: "capitalize",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "12px",
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        width: 8,
-                                        height: 8,
-                                        borderRadius: "50%",
-                                        background: "#f5f5f5",
-                                        display: "inline-block",
-                                        flexShrink: 0,
-                                    }}
-                                />
-                                {pageName}
-                            </span>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        />
+                        {pageName}
+                    </span>
+                </div>
+            </div>
         </>
     );
 }

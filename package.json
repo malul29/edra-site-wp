@@ -7,5 +7,8 @@
     "build": "cd client && npm run build",
     "start": "cd client && npm start",
     "install:all": "cd client && npm install"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
   }
 }
