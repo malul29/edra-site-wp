@@ -10,13 +10,9 @@ import TextRoll from "@/components/ui/text-roll";
 export default function Header() {
   const [solid, setSolid] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [isLightBg, setIsLightBg] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === "/";
-  const isProjectDetail = pathname.startsWith("/project/");
-  const isLightPage = pathname === "/blogs";
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -46,53 +42,6 @@ export default function Header() {
       // Set solid background - transparent on all pages at top, frosted-glass when scrolled
       setSolid(scrollY > 40);
 
-      // Check if navbar is over light section
-      if (isHome) {
-        const statementSection = document.querySelector(".statement-section");
-        let isOverLight = false;
-        if (statementSection) {
-          const rect = statementSection.getBoundingClientRect();
-          if (rect.top < 100 && rect.bottom > 0) {
-            isOverLight = true;
-          }
-        }
-        setIsLightBg(isOverLight);
-      } else if (pathname === "/projects") {
-        setIsLightBg(false);
-      } else if (pathname === "/blogs") {
-        const blogHero = document.querySelector(".blog-hero");
-        let isOverLight = false;
-        if (blogHero) {
-          const heroRect = blogHero.getBoundingClientRect();
-          if (heroRect.bottom < 100) {
-            isOverLight = true;
-          }
-        }
-        setIsLightBg(isOverLight);
-      } else if (pathname === "/about") {
-        const aboutHero = document.querySelector(".about-redesign-hero");
-        let isOverLight = false;
-        if (aboutHero) {
-          const heroRect = aboutHero.getBoundingClientRect();
-          if (heroRect.bottom < 100) {
-            isOverLight = true;
-          }
-        }
-        setIsLightBg(isOverLight);
-      } else if (pathname === "/contact") {
-        const contactHero = document.querySelector(".contact-hero");
-        let isOverLight = false;
-        if (contactHero) {
-          const heroRect = contactHero.getBoundingClientRect();
-          if (heroRect.bottom < 100) {
-            isOverLight = true;
-          }
-        }
-        setIsLightBg(isOverLight);
-      } else {
-        setIsLightBg(isLightPage);
-      }
-
       // Hide/show navbar based on scroll direction
       if (scrollY <= 50) {
         setVisible(true);
@@ -117,13 +66,13 @@ export default function Header() {
     updateScrollState();
 
     return () => window.removeEventListener("scroll", onScroll);
-  }, [isHome, isProjectDetail, isLightPage, pathname]);
+  }, []);
 
   const closeMobile = () => setMobileOpen(false);
 
   return (
     <header
-      className={`header ${solid ? "solid" : ""} ${isLightBg ? "light" : ""} ${servicesOpen ? "services-active" : ""} ${mobileOpen ? "mobile-open" : ""}`}
+      className={`header ${solid ? "solid" : ""} ${servicesOpen ? "services-active" : ""} ${mobileOpen ? "mobile-open" : ""}`}
       style={{
         transform: visible ? "translateY(0)" : "translateY(-100%)",
         transition: "transform 0.3s ease-in-out"
@@ -180,7 +129,7 @@ export default function Header() {
 
       {/* Fullscreen Services Menu (desktop hover) */}
       <div
-        className={`services-overlay ${servicesOpen ? 'active' : ''} ${isLightBg ? 'light' : ''}`}
+        className={`services-overlay ${servicesOpen ? 'active' : ''}`}
       >
         <div className="services-content">
           <div className="services-menu">

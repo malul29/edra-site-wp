@@ -185,30 +185,6 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                {/* ── VALUES ── */}
-                <section className="about-redesign-values">
-                    <div className="about-redesign-values-container">
-                        <h2 className="about-redesign-values-title">Our Core Values</h2>
-                        <div className="about-redesign-values-grid">
-                            <div className="about-redesign-value-item">
-                                <h3>Excellence</h3>
-                                <p>We pursue the highest standards in every aspect of our work, never settling for mediocrity.</p>
-                            </div>
-                            <div className="about-redesign-value-item">
-                                <h3>Innovation</h3>
-                                <p>We embrace new technologies and methods while respecting timeless design principles.</p>
-                            </div>
-                            <div className="about-redesign-value-item">
-                                <h3>Integrity</h3>
-                                <p>We build lasting relationships through transparency, honesty, and ethical practices.</p>
-                            </div>
-                            <div className="about-redesign-value-item">
-                                <h3>Sustainability</h3>
-                                <p>We design for longevity and environmental responsibility in every project we undertake.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
                 {/* ── PROFESSIONAL TEAM ── */}
                 <section className="prof-section">
                     {/* Section Header */}

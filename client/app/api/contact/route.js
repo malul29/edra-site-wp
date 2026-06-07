@@ -32,23 +32,24 @@ export async function POST(req) {
         // Optional: Forward to WordPress Contact Form 7 (if plugin is installed)
         // Uncomment and set NEXT_PUBLIC_WORDPRESS_URL env var + CF7 form ID to enable.
         //
-        // const wpBase = (process.env.NEXT_PUBLIC_WORDPRESS_URL || "").replace(/\/$/, "");
-        // const cf7FormId = process.env.CF7_FORM_ID || "";
-        // if (wpBase && cf7FormId) {
-        //     const formData = new FormData();
-        //     formData.append("your-name", name);
-        //     formData.append("your-email", email);
-        //     formData.append("your-subject", service || "General Inquiry");
-        //     formData.append("your-message", message);
-        //     const cf7Res = await fetch(
-        //         `${wpBase}/wp-json/contact-form-7/v1/contact-forms/${cf7FormId}/feedback`,
-        //         { method: "POST", body: formData }
-        //     );
-        //     const cf7Data = await cf7Res.json();
-        //     if (cf7Data.status !== "mail_sent") {
-        //         console.warn("[contact] CF7 warning:", cf7Data.message);
-        //     }
-        // }
+        const wpBase = (process.env.NEXT_PUBLIC_WORDPRESS_URL || "").replace(/\/$/, "");
+        const cf7FormId = process.env.CF7_FORM_ID || "";
+        if (wpBase && cf7FormId) {
+            const formData = new FormData();
+            formData.append("your-name", name);
+            formData.append("your-email", email);
+            formData.append("your-subject", service || "General Inquiry");
+            formData.append("your-message", message);
+            const cf7Res = await fetch(
+                `${wpBase}/wp-json/contact-form-7/v1/contact-forms/${cf7FormId}/feedback`,
+                { method: "POST", body: formData }
+            );
+            const cf7Data = await cf7Res.json();
+            if (cf7Data.status !== "mail_sent") {
+                console.warn("[contact] CF7 warning:", cf7Data.message);
+            }
+        }
+
 
         return NextResponse.json({ success: true });
     } catch {

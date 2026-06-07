@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import IntroAnimation from "../components/IntroAnimation";
 import BackToTop from "../components/BackToTop";
+import PageTransition from "../components/PageTransition";
 
 function useScrollReveal(enabled) {
     useEffect(() => {
@@ -56,7 +57,9 @@ export default function BodyWrapper({ children }) {
                 <IntroAnimation onComplete={() => setIntroPlaying(false)} />
             )}
             <div style={{ visibility: introPlaying ? "hidden" : "visible" }}>
-                {children}
+                <PageTransition>
+                    {children}
+                </PageTransition>
                 <BackToTop />
             </div>
         </>
