@@ -9,6 +9,7 @@ interface GooeyTextProps {
   cooldownTime?: number;
   className?: string;
   textClassName?: string;
+  loop?: boolean;
 }
 
 export function GooeyText({
@@ -17,6 +18,7 @@ export function GooeyText({
   cooldownTime = 0.25,
   className,
   textClassName,
+  loop = true,
 }: GooeyTextProps) {
   const text1Ref = React.useRef<HTMLSpanElement>(null);
   const text2Ref = React.useRef<HTMLSpanElement>(null);
@@ -65,8 +67,16 @@ export function GooeyText({
       setMorph(fraction);
     };
 
+    let isDone = false;
+
     const animate = () => {
       if (disposed) return;
+      
+      if (!loop && isDone) {
+        doCooldown();
+        return;
+      }
+
       raf = requestAnimationFrame(animate);
 
       const newTime = new Date();
@@ -78,6 +88,10 @@ export function GooeyText({
 
       if (cooldown <= 0) {
         if (shouldIncrementIndex) {
+          if (!loop && textIndex === texts.length - 2) {
+             isDone = true;
+             return;
+          }
           textIndex = (textIndex + 1) % texts.length;
           if (text1Ref.current && text2Ref.current) {
             text1Ref.current.textContent = texts[textIndex % texts.length];
@@ -96,7 +110,7 @@ export function GooeyText({
       disposed = true;
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [texts, morphTime, cooldownTime]);
+  }, [texts, morphTime, cooldownTime, loop]);
 
   return (
     <div className={cn("relative", className)}>

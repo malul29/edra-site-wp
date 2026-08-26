@@ -5,7 +5,7 @@ import gsap from "gsap";
 import Image from "next/image";
 import { GooeyText } from "@/components/ui/gooey-text-morphing";
 
-const WORDS = ["Design.", "Build.", "Inspire."];
+const WORDS = ["design", "build", "inspire"];
 
 export default function IntroAnimation({ onComplete }) {
     const [mounted, setMounted] = useState(true);
@@ -132,6 +132,7 @@ export default function IntroAnimation({ onComplete }) {
                         texts={WORDS}
                         morphTime={0.85}
                         cooldownTime={0.28}
+                        loop={false}
                         className="h-[160px]"
                         textClassName="font-archivo font-extrabold tracking-[-0.03em] text-[#f5f5f5] text-[clamp(42px,8vw,120px)] leading-none"
                     />
