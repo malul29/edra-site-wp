@@ -36,7 +36,7 @@ const GRAPHQL_ENDPOINT = `${WP_BASE_URL}/graphql`;
 async function graphqlFetch(query, variables = {}) {
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: "POST",
-    next: { revalidate: 60 }, // ISR: re-fetch every 60s in production
+    next: { revalidate: 0 }, // ISR: 0 ensures fresh data is fetched every time
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
